@@ -1,0 +1,154 @@
+#!/bin/bash
+
+
+# Description: script to do inventory on a server and decide its fate.
+# Author: Liliane
+# Date: Jan 13
+
+
+echo -e "\nHello! what can i do for you today?\n"
+echo -e "\ntype: A for Server inventory or B for play soccer or C for eat steak\n"
+read ANSW
+if [ $ANSW == A ]
+then
+echo -e "\n Let's do your server inventory\n"
+elif [ $ANSW == B ]
+then
+echo -e "\nSorry, I am not able to answer your request\n"
+echo -e "\nCould you please go to a soccer field instead\n"
+echo -e "\nThank you for your understanding\n"
+echo "👀👀👀👀👀"
+echo
+exit 0
+elif [ $ANSW == C ]
+then
+echo -e "\nSorry, I am not able to answer your request\n"
+echo -e "\nCould you please go to a restaurant instead\n"
+echo -e "\nThank you for your reply\n"
+echo "👀👀👀👀👀"
+echo
+exit 0
+fi
+sleep 2
+# Check OS version
+OS=`cat /etc/*release |grep PRETTY_NAME | awk -F= '{print$2}'`
+echo -e "\nOS version : $OS.\n"
+sleep 2
+# Check size of memory
+Mem=`cat /proc/meminfo |grep MemTotal | awk -F: '{print$2}'`
+echo -e "\nMemory (KB) : $Mem\n"
+sleep 2
+# Check size of harddrive
+Disk=`lsblk | grep disk | awk '{print$4}'`
+echo -e "\nHardrive (G) :  $Disk\n"
+sleep 2
+# Check the CPU core
+echo
+echo -n "CPU cores:"
+ cat /proc/cpuinfo |grep "cpu cores" |awk -F: '{print$2}'
+sleep 2
+# Check the processor speed
+echo
+echo -n "Processor speed (MHz):"
+  lscpu |grep "CPU MHz" |awk -F: '{print$2}'
+sleep 2
+#check kernel version
+Ker=`iostat |grep Linux |awk '{print$2}' |awk -F. '{print$1}'`
+KER=`iostat |grep Linux |awk '{print$2}'`
+if [ $Ker -ge 5 ]
+then
+echo -e "\nThis system is update and its kernel version is $KER\n"
+else
+echo -e "\nThis system is not  update and its kernel version is $KER\n"
+fi
+sleep 2
+#check the computer architecture
+Arch=`arch |awk -F_ '{print$2}'`
+if [ $Arch -ne 32 ]
+then
+echo -e "\nComputer architecture : $Arch bits\n"
+fi
+sleep 2
+# Check the hostname
+echo -e "\nHostname : `hostnamectl |grep hostname |awk -F: '{print$2}'`\n"
+sleep 2
+# check the ip address
+IP=`ifconfig |grep "255.255.255.0" |awk '{print$2}'`
+echo -e "\nIP address : $IP\n"
+sleep 2
+# Check all opened ports
+echo -e "\nAll opened ports :\n"
+netstat -plunt | grep LISTEN
+sleep 2
+echo
+echo
+#Check if apache2 is installed
+apache2 -v
+if [  $? -eq 0 ]
+then
+echo -e "\nApache2 is installed\n"
+fi
+sleep 2
+#Check if docker is installed
+docker -v
+if [  $? -eq 0 ]
+then
+echo -e "\nDocker is installed\n"
+fi
+sleep 2
+# Check if the webserver is up and running
+echo
+netstat -plunt | grep apache2
+if [  $? -eq 0 ]
+then
+echo -e "\nThe webserver is up and running\n"
+fi
+sleep 2
+# Check DNS (Domain Name System)
+echo -e "\nDNS : \n"
+nmcli dev show | grep IP4.DNS
+echo
+echo
+sleep 2
+# Check the Manufacturer
+dmidecode -t system | grep Manufacturer
+echo
+echo
+sleep 2
+# Check the model of the machine
+dmidecode -t system | grep Product
+sleep 2
+echo
+# Check the MAC address (Media Access Control address)
+echo -e "\nMAC address : `ifconfig |grep 1000 |grep ether |awk '{print$2}'`\n"
+sleep 2
+# a summary of inventory
+echo -e "\nA summary of inventory\n"
+inxi
+echo
+sleep 2
+# the decision
+echo -e "\nIn brief, this server runs perfectly and no need to be decomissioned.\n"
+echo
+echo -n "Thank you for your confidence"
+echo "😀😀😀😀😀😀😀😀😀😀😀"
+sleep 2
+# End
+echo -e "\n Can i do anything else for you?; Choose yes or no\n"
+read ANS
+if [ $ANS == yes ]
+then
+echo
+echo -e "\nWhat can i do for you?\n"
+sleep 2
+echo -e "\nSorry, i am busy now, may be next time\n"
+echo -e "\n Thank you for your understanding\n"
+else
+echo
+echo -n "Thank you for stopping by"
+echo "💪💪💪💪💪💪💪💪💪"
+fi
+echo
+echo
+
+
